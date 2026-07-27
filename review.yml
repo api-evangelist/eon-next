@@ -1,0 +1,312 @@
+aid: eon-next
+name: E.ON Next
+review:
+  question: Does E.ON Next publish a public developer/API surface, and is any energy
+    consumer-data mandate actually implemented by it?
+  answer: false
+  date: '2026-07-27'
+  reviewer: API Evangelist
+  homeMarket: United Kingdom
+  tier: utility-retailer
+findings:
+  summary: |
+    E.ON Next Energy Limited is the UK retail supply arm of the E.ON Group (formed
+    out of the November 2019 npower acquisition, brand migration from July 2020),
+    supplying electricity and gas to roughly five million GB households and small
+    businesses. It publishes NO developer portal, NO API documentation, NO OpenAPI
+    or other machine-readable contract, and NO third-party route to a customer's
+    usage or billing data. This is not an absence of technology — E.ON Next runs on
+    Kraken, the API-first, GraphQL-enabled energy operating system licensed from
+    Kraken Technologies (Octopus Energy Group), with 5.8 million customers migrated
+    onto Kraken Customer between June 2020 and June 2022. The API-first platform is
+    entirely inward-facing. Sister supplier Octopus Energy exposes the same Kraken
+    lineage through a real public developer portal at developer.octopus.energy;
+    E.ON Next exposes none of it.
+  developerSurfaceProbe:
+    date: '2026-07-27'
+    method: anonymous HTTPS GET/POST, curl, User-Agent Mozilla/5.0, redirects followed
+    results:
+    - url: https://www.eonnext.com/
+      status: 200
+      note: Marketing and customer-account site. No developer, API, or data section anywhere.
+    - url: https://developer.eonnext.com/
+      status: 000
+      note: DNS/connection failure — host does not resolve.
+    - url: https://developers.eonnext.com/
+      status: 000
+      note: DNS/connection failure — host does not resolve.
+    - url: https://docs.eonnext.com/
+      status: 000
+      note: DNS/connection failure — host does not resolve.
+    - url: https://api.eonnext.com/
+      status: 403
+      note: >-
+        Host exists and answers application/json 42 bytes:
+        {"message":"Missing Authentication Token"} — the canonical AWS API Gateway
+        response. Undocumented, internal/app-facing. No public contract.
+    - url: https://api.eonnext.com/v1/
+      status: 403
+    - url: https://api.eonnext.com/v1/graphql/
+      status: 403
+      note: Probed because Kraken tenants commonly expose /v1/graphql/ (Octopus does).
+        Same AWS API Gateway 403; no introspection, no documentation.
+    - url: https://api.eonnext.com/v1/graphql/ (POST {"query":"{__typename}"})
+      status: 403
+    - url: https://api.eonnext.com/graphql
+      status: 403
+    - url: https://api.eonnext.com/openapi.json
+      status: 403
+    - url: https://api.eonnext.com/swagger.json
+      status: 403
+    - url: https://api.eonnext.com/.well-known/openid-configuration
+      status: 403
+      note: Not served anonymously. No OIDC discovery document obtained.
+    - url: https://data.eonnext.com/
+      status: 403
+      note: Same AWS API Gateway 403 shape. Not an open-data portal.
+    - url: https://data.eonnext.com/openapi.json
+      status: 403
+    - url: https://www.eonnext.com/developers
+      status: 404
+    - url: https://www.eonnext.com/api
+      status: 404
+    - url: https://www.eonnext.com/docs
+      status: 404
+    - url: https://www.eonnext.com/data
+      status: 404
+    - url: https://www.eonnext.com/open-data
+      status: 404
+    - url: https://www.eonnext.com/api-docs
+      status: 404
+    - url: https://www.eonnext.com/openapi.json
+      status: 404
+    - url: https://www.eonnext.com/.well-known/openid-configuration
+      status: 404
+    - url: https://www.eonnext.com/.well-known/apis.json
+      status: 404
+    - url: https://www.eonnext.com/.well-known/security.txt
+      status: 200
+      note: PGP-signed. Contact mailto:security@eon.com, expires 2026-12-31. Group-level
+        security contact, not a developer channel.
+    - url: https://www.eonnext.com/robots.txt
+      status: 200
+      note: Points at https://www.eonnext.com/sitemap_index.xml.
+    - url: https://www.eonnext.com/sitemap_index.xml
+      status: 200
+      note: >-
+        Full sitemap enumerated — 364 unique URLs across sitemap_refresh.xml and
+        sitemap_medusa.xml. ZERO URLs contain an /api, /apis, /developer,
+        /developers, /docs, or /open-data path segment. The absence of a developer
+        surface is confirmed from the company's own site index, not inferred.
+    - url: https://api.github.com/orgs/eonnext
+      status: 404
+    - url: https://api.github.com/orgs/eon-next
+      status: 404
+      note: No public GitHub organisation found under either slug.
+mandate:
+  regime: smart-meter-infrastructure
+  regimeName: >-
+    Great Britain Smart Metering Implementation Programme — Smart Energy Code (SEC)
+    and the licensed Data Communications Company (Smart DCC) monopoly, under Ofgem
+    supply-licence conditions.
+  status: live-implemented
+  statusIsAbout: >-
+    THE INFRASTRUCTURE OBLIGATION ONLY. This is the point of the finding: Britain
+    mandated the pipes, not the data right. What is live and implemented is smart
+    metering — SMETS2 meters installed by E.ON Next, communicating over the licensed
+    DCC network, governed by the Smart Energy Code to which accession is mandatory
+    for every GB supplier. What is NOT mandated, and NOT implemented, is any
+    consumer data-portability API. The mandate produces no supplier-published
+    endpoint whatsoever; the API in this regime belongs to the DCC, not to E.ON Next.
+  howVerified:
+    - >-
+      Ofgem regulator decision pages naming "E.ON Next Energy Limited" as an
+      appointed Supplier of Last Resort confirm it is a licensed GB supplier and
+      therefore bound by the SEC —
+      https://www.ofgem.gov.uk/decision/appointment-eon-next-energy-limited-supplier-last-resort
+      (HTTP 200, fetched 2026-07-27).
+    - >-
+      E.ON Next's own live smart-metering programme pages —
+      https://www.eonnext.com/smart (200),
+      https://www.eonnext.com/smart/smart-meter-installation (200),
+      https://www.eonnext.com/help/smart (200). The /help/smart page instructs
+      customers to "set your meter to send us half hourly data" through the online
+      account — i.e. half-hourly data flows INTO E.ON Next and never back out.
+    - >-
+      The Smart Energy Code itself makes accession mandatory for GB suppliers and
+      relevant network operators — https://smartenergycodecompany.co.uk/ (the SEC
+      party register pages at /sec-parties/ and /parties/ returned HTTP 403 to
+      anonymous probes on 2026-07-27, so a direct E.ON Next party-register line item
+      was NOT independently retrieved; licensed-supplier status was established from
+      the Ofgem decisions above instead).
+  notImplementedHere:
+    consumerDataRight: >-
+      NO consumer data-portability mandate applies to E.ON Next. There is no UK
+      equivalent of the Australian CDR (energy) and no Ontario-style Green Button
+      regulation. DESNZ's "Developing an energy smart data scheme" call for evidence
+      (https://www.gov.uk/government/calls-for-evidence/developing-an-energy-smart-data-scheme/developing-an-energy-smart-data-scheme-call-for-evidence-html,
+      HTTP 200) closed 10 March 2025 with no published government response. Smart
+      data schemes under the Data (Use and Access) Act 2025 require sector-specific
+      secondary legislation that has not been made for energy. E.ON Next is
+      therefore not designated, not obligated, and not late — the right does not
+      exist yet. Recorded as: none / not-applicable for the consumer data right,
+      separately from the live infrastructure mandate above.
+    relatedRegulatorActivity: >-
+      Ofgem/DESNZ Joint Open Letter "Wider Access to Smart Metering Data", March 2026
+      (https://www.ofgem.gov.uk/sites/default/files/2026-03/Joint-Open-Letter-Wider-Access-to-Smart-Metering-Data.pdf,
+      HTTP 200) — an open letter is policy signalling, not an obligation and not an
+      implementation.
+  greenButton:
+    applies: false
+    note: No Green Button / ESPI reference of any kind found on eonnext.com, and no
+      Green Button Alliance certification. Green Button is a North American standard;
+      neither the voluntary nor the Ontario-mandated form reaches a GB supplier.
+  cdrEnergy:
+    applies: false
+    note: E.ON Next is a GB entity. Australian CDR energy designation, the CDR
+      register, and the Consumer Data Standards (energy) do not apply.
+dataStandard:
+  implemented: >-
+    SMETS2 / Smart Energy Code (DCC) metering infrastructure only. No consumer-facing
+    API data standard is published.
+  searchedForAndNotFound:
+    - Green Button / ESPI (any version)
+    - CDR Consumer Data Standards (energy)
+    - OCPP / OCPI (despite E.ON Next selling EV chargers and running the Next Drive
+      EV tariff, no charging API or roaming protocol is documented publicly)
+    - OpenADR
+    - IEEE 2030.5
+    - IEC CIM 61968 / 61970
+  proprietary: >-
+    The underlying platform is Kraken (Kraken Technologies / Octopus Energy Group) —
+    a proprietary, API-first, GraphQL-shaped energy operating system. Confirmed by
+    the vendor's own case study at https://kraken.tech/case-studies/eon-next (HTTP
+    200, fetched 2026-07-27), which states E.ON Next migrated 5.8 million customers
+    onto Kraken Customer between June 2020 and June 2022 using an iterative S-curve
+    model, and describes an "API-first architecture and GraphQL-enabled services".
+    None of that surface is exposed to third parties by E.ON Next.
+consumerVsMarketData:
+  consumerDataApi: false
+  consumerDataNote: >-
+    No documented API exists by which a third party — or the customer themselves —
+    can obtain an individual E.ON Next customer's usage or billing data. Data is
+    viewable only inside the logged-in online account and mobile app. E.ON Next
+    community and public discussion consistently report that no customer API is
+    offered; consumers wanting half-hourly data in GB route around the supplier
+    entirely, via DCC "Other User" intermediaries (Hildebrand Glow / Bright, Loop,
+    GeoTogether) that hold Smart Energy Code party status and pull from the DCC with
+    the bill-payer's consent. The third-party data path in Britain bypasses the
+    supplier by design.
+  marketDataOpen: false
+  marketDataNote: >-
+    E.ON Next publishes no open grid, market, or system data. That is structurally
+    correct for a GB retailer: open market data in Britain is published by other
+    parties — NESO (the genuinely open Carbon Intensity API), Elexon (Balancing and
+    Settlement / BMRS), and the DNO open-data portals. E.ON no longer owns GB
+    distribution networks, so E.ON Next has no network open-data programme to run.
+    The split is therefore closed/closed at this organisation, with the open half of
+    the sector living entirely outside it.
+access:
+  gate: none-published
+  whatADeveloperMustDo: >-
+    Nothing works. There is no signup, no application form, no partner programme, no
+    accreditation path, and no data licence published for API access to E.ON Next.
+    The only way to see E.ON Next data is to be an E.ON Next customer and log into
+    the account area or mobile app at www.eonnext.com (human UI, not an API — and
+    /dashboard/* is Disallowed in robots.txt). A developer who wants GB smart-meter
+    data programmatically must instead become a Smart Energy Code party in the DCC
+    "Other User" role, or integrate a consumer-consent intermediary that already
+    holds that status — a route that runs through the DCC and the SEC, not through
+    E.ON Next.
+  gated: true
+authModel:
+  scheme: none-published
+  observed: >-
+    api.eonnext.com and data.eonnext.com return the AWS API Gateway
+    {"message":"Missing Authentication Token"} 403 on every probed path, which
+    indicates an authenticated/unmatched AWS API Gateway deployment but discloses no
+    scheme. /.well-known/openid-configuration was fetched anonymously on both
+    www.eonnext.com (404) and api.eonnext.com (403) — no OIDC discovery document was
+    served. No API key programme, no OAuth2 authorization server, no mTLS profile,
+    and no CDR-style accreditation is documented. Customer authentication is a
+    conventional web/mobile account login.
+platformLineage:
+  vendor: Kraken Technologies (Octopus Energy Group)
+  product: Kraken Customer
+  migration: 5.8M customers, June 2020 – June 2022
+  architecture: API-first, GraphQL-enabled (per vendor case study)
+  contrast: >-
+    The same platform under Octopus Energy's own brand powers a real, public,
+    documented developer portal (developer.octopus.energy — REST + GraphQL, free
+    tariff and product endpoints, customer API keys). Licensing an API-first platform
+    does not license an API-first posture. E.ON Next is the control case that proves
+    the platform is not the product decision.
+sources:
+- url: https://www.eonnext.com/
+  type: Website
+  status: 200
+  note: Retail marketing and customer account entry point.
+- url: https://www.eonnext.com/about
+  type: About
+  status: 200
+  note: Confirms E.ON Next Energy Limited, registered England & Wales No. 3782443,
+    Trinity House Nottingham; npower acquired November 2019, brand migration from
+    July 2020; supplies electricity, gas, EV chargers, solar, batteries, heat pumps.
+    No mention of APIs, developers, or platform.
+- url: https://www.eonnext.com/sitemap_index.xml
+  type: Sitemap
+  status: 200
+  note: 364 unique URLs; zero developer/API/data path segments.
+- url: https://www.eonnext.com/.well-known/security.txt
+  type: SecurityTxt
+  status: 200
+- url: https://api.eonnext.com/
+  type: APIHost
+  status: 403
+  note: '{"message":"Missing Authentication Token"} — AWS API Gateway, undocumented.'
+- url: https://data.eonnext.com/
+  type: APIHost
+  status: 403
+  note: Same AWS API Gateway 403; not an open-data portal.
+- url: https://kraken.tech/case-studies/eon-next
+  type: CaseStudy
+  status: 200
+  note: Vendor case study — 5.8M customers migrated to Kraken Customer June 2020 –
+    June 2022; "API-first architecture and GraphQL-enabled services".
+- url: https://www.ofgem.gov.uk/decision/appointment-eon-next-energy-limited-supplier-last-resort
+  type: Regulator
+  status: 200
+  note: Ofgem decision naming E.ON Next Energy Limited as Supplier of Last Resort —
+    evidence of licensed GB supplier status.
+- url: https://www.gov.uk/government/calls-for-evidence/developing-an-energy-smart-data-scheme/developing-an-energy-smart-data-scheme-call-for-evidence-html
+  type: Regulation
+  status: 200
+  note: DESNZ energy smart data scheme call for evidence — closed 10 March 2025, no
+    published government response; no secondary legislation made.
+- url: https://www.ofgem.gov.uk/sites/default/files/2026-03/Joint-Open-Letter-Wider-Access-to-Smart-Metering-Data.pdf
+  type: Regulator
+  status: 200
+  note: March 2026 Ofgem/DESNZ joint open letter on wider access to smart metering
+    data — signalling, not obligation.
+- url: https://www.eonnext.com/help/smart
+  type: Documentation
+  status: 200
+  note: Half-hourly data setting flows data to E.ON Next; no export, API, or
+    third-party access described.
+- url: https://smartenergycodecompany.co.uk/
+  type: Standard
+  status: 200
+  note: Smart Energy Code — mandatory accession for GB suppliers. Party register
+    pages returned 403 to anonymous probes.
+actions:
+  apisYmlUpdated: true
+  apisListed: 0
+  openapiHarvested: false
+  specsCount: 0
+  openapiDirectoryCreated: false
+  reason: >-
+    Nothing real was found to save. Every candidate contract path on every candidate
+    host returned 403 (AWS API Gateway, no body beyond the error) or 404, and the
+    company's own sitemap contains no developer surface at all. Fabricating an
+    endpoint, a spec, or a scope would have been the only way to fill openapi/ — so
+    openapi/ is deliberately absent and apis[] is deliberately empty.
