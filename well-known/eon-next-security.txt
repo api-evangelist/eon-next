@@ -1,0 +1,23 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+Contact: mailto:security@eon.com
+Expires: 2026-12-31T22:59:00.000Z
+Encryption: https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf6f9fb4d40f95f470d9cebfc477ba6dcfd27aece
+Preferred-Languages: en, de
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEE9vn7TUD5X0cNnOv8R3um3P0nrs4FAmlCXbAACgkQR3um3P0n
+rs7D2g/9Ec9Ee9fcrCLZpZhTBu+nrIVXhxv4AUF01Pc25MBwIvw2XvfTNC5DQSAz
+6sIv+aYBGpKJvx9W/2fARqUGdW7/M6Y4p3Tw8DGcNlySEwWs2a47F8j/zcBPS6Kk
+903jMH5S8EPNOlFSsHuQKo0dWquFNMxu95V3exQAAgYkTbkaa9W4bo14itZpsQ2w
+JMVA0kRGAbVB40OHkuLV1NUWYwyLmUumkLPaDyjaboB0Kudexn4RkZdd3FT0eT93
+D6fMpZbT6Hjz556BIenH+BWL0KiepRq9hxZS/XO6IYxnWKS2cej3zo8kIeJ0Y7yr
+fNQQrZ8p5/EK2pPADAHz9ncNn3NPYhydCQ0xhk3Ip++kJuBdPnGB3MigVNd5hCiT
+PtzU3CwveqpWq9re34kjjYCsmRNSoJJP1PM+X6aue+QHQEmHejFQ5XSWH16mnCg6
+P58Lxck5rDS4q0yMYaJ7p/VR6nrNsR4NY3yJFyAQvcsbu2R5bp0zyyzU52ss4lAv
+s+E2LdnVxSGAOKNuqDfp7YdcnvbkKDvGUZ/mh1UyUomNH0nH2Yq5wUfbUDuM9BOD
+odxCTfEppR+c7L5Kn92HpYyKMd4rIYCNFKKiqCckFsyGP8AH14iexgrO2ipy8bKj
+bCVvevVdJnhve3VInDmg2R8KVvVuJ7UVqTSoM/eHC23/j2R62ow=
+=EB1m
+-----END PGP SIGNATURE-----

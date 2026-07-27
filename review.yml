@@ -298,9 +298,87 @@ sources:
   status: 200
   note: Smart Energy Code — mandatory accession for GB suppliers. Party register
     pages returned 403 to anonymous probes.
+enrichmentRounds:
+- date: '2026-07-27'
+  round: 2
+  method: >-
+    Full contract-discovery sweep against every host that resolves under
+    eonnext.com, not just www and api. Anonymous curl, User-Agent Mozilla/5.0,
+    redirects followed.
+  amendment: >-
+    CORRECTION OF SCOPE, NOT OF FINDING. The round-1 statement
+    "/.well-known/openid-configuration was fetched anonymously on both
+    www.eonnext.com (404) and api.eonnext.com (403) — no OIDC discovery document
+    was served" is accurate for those two hosts, but a third host was not probed.
+    auth.eonnext.com resolves to an Auth0 custom domain
+    (eon-next-uk-cd-...edge.tenants.eon-ciam.auth0app.com; certificate CN
+    eon-next-uk.eon-ciam.auth0app.com) and serves a COMPLETE, anonymous OpenID
+    Connect discovery document (HTTP 200), the RFC 8414
+    /.well-known/oauth-authorization-server alias (HTTP 200, byte-identical) and
+    /.well-known/jwks.json (HTTP 200). That is a real machine-readable contract
+    and it has been harvested verbatim into well-known/.
+  doesNotChange: >-
+    The core finding stands. This is the customer identity provider for the
+    online account and mobile app — it advertises only OIDC/Auth0 claim scopes,
+    no domain scope, no resource server, and no documented third-party client
+    registration path. There is still no developer portal, no OpenAPI, no
+    reachable GraphQL, and no route to a customer's usage or billing data.
+  reProbed:
+    date: '2026-07-27'
+    results:
+    - {url: 'https://auth.eonnext.com/.well-known/openid-configuration', status: 200, note: 'saved to well-known/eon-next-openid-configuration.json'}
+    - {url: 'https://auth.eonnext.com/.well-known/oauth-authorization-server', status: 200, note: 'RFC 8414; byte-identical to the OIDC document'}
+    - {url: 'https://auth.eonnext.com/.well-known/jwks.json', status: 200, note: 'two RSA RS256 signing keys'}
+    - {url: 'https://auth.eonnext.com/.well-known/security.txt', status: 404}
+    - {url: 'https://auth.eonnext.com/.well-known/oauth-protected-resource', status: 404}
+    - {url: 'https://auth.eonnext.com/openapi.json', status: 404}
+    - {url: 'https://www.eonnext.com/llms.txt', status: 404}
+    - {url: 'https://community.eonnext.com/llms.txt', status: 200, note: 'FALSE POSITIVE — body is an Anubis anti-scraping proof-of-work interstitial, not an llms.txt.'}
+    - {url: 'https://www.eonnext.com/sitemap_index.xml', status: 200, note: 're-enumerated 2026-07-27: 414 unique URLs, still zero /api, /developer, /docs or /open-data path segments.'}
+    - {url: 'https://www.eonnext.com/dashboard/sign-in', status: 200, note: 'human login page; /login redirects here.'}
+    - {url: 'https://www.eonnext.com/terms-and-conditions', status: 200}
+    - {url: 'https://api.eonnext.com/openapi.yaml', status: 403}
+    - {url: 'https://api.eonnext.com/redoc', status: 403}
+    - {url: 'https://api.eonnext.com/rapidoc', status: 403}
+    - {url: 'https://api.eonnext.com/health', status: 403}
+    - {url: 'https://registry.npmjs.org/-/v1/search?text=eonnext', status: 200, note: 'zero packages. PyPI eonnext / eon-next / eonnext-api / pyeonnext all 404. No first-party SDK exists.'}
+    - {url: 'https://api.github.com/orgs/eonenergy', status: 200, note: 'exists but is an empty placeholder — 0 public repos, no name, no description, no blog. Not wired as a GitHubOrganization.'}
+    - {url: 'https://www.eon.com/.well-known/security.txt', status: 200, note: 'byte-identical to the E.ON Next file — one group-wide RFC 9116 document.'}
+    hostsThatDoNotResolve: [developer.eonnext.com, developers.eonnext.com, docs.eonnext.com, status.eonnext.com, mcp.eonnext.com]
+  artifactsWritten:
+  - well-known/eon-next-well-known.yml
+  - well-known/eon-next-security.txt
+  - well-known/eon-next-openid-configuration.json
+  - well-known/eon-next-oauth-authorization-server.json
+  - well-known/eon-next-jwks.json
+  - authentication/eon-next-authentication.yml
+  - scopes/eon-next-scopes.yml
+  - conformance/eon-next-conformance.yml
+  - security/eon-next-domain-security.yml
+  - security/eon-next-vulnerability-disclosure.yml
+  - llms/eon-next-llms.txt
+  notWritten:
+    openapi: no spec exists on any host
+    graphql: reachable only as an AWS API Gateway 403; introspection impossible
+    asyncapi: no event, streaming or webhook surface
+    packages: no first-party SDK in any registry
+    cli: none published
+    sandbox: none published
+    changelog: none published
+    lifecycle: no status page, no versioning policy, no deprecation policy — status.eonnext.com does not resolve
+    mcp: no server, and no OpenAPI to derive candidate tools from
+    skills: no OpenAPI to ground an agent skill in
+    conventions: no documented request/response semantics
+    errors: only the AWS API Gateway "Missing Authentication Token" body is observable
+    trustCenter: no trust/compliance portal; no named certifications published
 actions:
   apisYmlUpdated: true
-  apisListed: 0
+  apisListed: 1
+  apisListedNote: >-
+    Round 2 lists one API — the E.ON Next Customer Identity (OpenID Connect)
+    authorization server at https://auth.eonnext.com/ — on the strength of its
+    anonymous, complete discovery document. It is catalogued as identity, not as
+    a developer programme.
   openapiHarvested: false
   specsCount: 0
   openapiDirectoryCreated: false

@@ -1,6 +1,6 @@
 # E.ON Next (eon-next)
 
-E.ON Next Energy Limited is the United Kingdom retail supply arm of the E.ON Group, formed after E.ON's 2019 acquisition of npower and serving roughly five million British households and small businesses with electricity, gas, smart meters, solar, home batteries, heat pumps and EV charging tariffs. It sits at the retail end of the GB energy value chain — buying wholesale, settling through Elexon, reading SMETS2 smart meters over the licensed Smart DCC network, and billing the customer — and it runs its entire operation on Kraken, the API-first, GraphQL-based energy operating system licensed from Kraken Technologies (Octopus Energy Group), onto which 5.8 million customers were migrated between June 2020 and June 2022. Its API posture is the exact opposite of its platform's reputation: the Kraken architecture underneath is API-first, but nothing is published outward. There is no developer portal, no API documentation, no OpenAPI, and no third-party route to a customer's usage or billing data; developer.eonnext.com and docs.eonnext.com do not resolve, and api.eonnext.com answers every path with an unauthenticated AWS API Gateway 403 "Missing Authentication Token". Britain mandated the metering infrastructure, not the data right — E.ON Next is bound by the Smart Energy Code and the DCC, which is live and implemented, but no consumer data-portability mandate equivalent to Australia's CDR or Ontario's Green Button applies to it, and none of the open GB market data (NESO Carbon Intensity, Elexon BSC, DNO open-data portals) originates here. Consumer data is closed, market data is published by other parties, and this profile is identity-only by evidence.
+E.ON Next Energy Limited is the United Kingdom retail supply arm of the E.ON Group, formed after E.ON's 2019 acquisition of npower and serving roughly five million British households and small businesses with electricity, gas, smart meters, solar, home batteries, heat pumps and EV charging tariffs. It sits at the retail end of the GB energy value chain — buying wholesale, settling through Elexon, reading SMETS2 smart meters over the licensed Smart DCC network, and billing the customer — and it runs its entire operation on Kraken, the API-first, GraphQL-based energy operating system licensed from Kraken Technologies (Octopus Energy Group), onto which 5.8 million customers were migrated between June 2020 and June 2022. Its API posture is the exact opposite of its platform's reputation: the Kraken architecture underneath is API-first, but almost nothing is published outward. There is no developer portal, no API documentation, no OpenAPI, and no third-party route to a customer's usage or billing data; developer.eonnext.com and docs.eonnext.com do not resolve, and both api.eonnext.com and data.eonnext.com answer every path with an unauthenticated AWS API Gateway 403 "Missing Authentication Token". The one machine-readable contract E.ON Next does publish is its customer identity layer — auth.eonnext.com, an Auth0 CIAM tenant, serves a complete anonymous OpenID Connect / RFC 8414 discovery document and JWKS — which describes how a customer signs in, not how a developer gets access. Britain mandated the metering infrastructure, not the data right: E.ON Next is bound by the Smart Energy Code and the DCC, which is live and implemented, but no consumer data-portability mandate equivalent to Australia's CDR or Ontario's Green Button applies to it, and none of the open GB market data (NESO Carbon Intensity, Elexon BSC, DNO open-data portals) originates here. Consumer data is closed, market data is published by other parties, and the only public contract is identity.
 
 **APIs.json:** [https://raw.githubusercontent.com/api-evangelist/eon-next/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/eon-next/refs/heads/main/apis.yml)
 
@@ -16,6 +16,7 @@ E.ON Next Energy Limited is the United Kingdom retail supply arm of the E.ON Gro
 - Kraken
 - Solar
 - EV Charging
+- Identity
 
 ## Timestamps
 
@@ -24,9 +25,11 @@ E.ON Next Energy Limited is the United Kingdom retail supply arm of the E.ON Gro
 
 ## APIs
 
-_No public APIs are documented by E.ON Next._
+**E.ON Next Customer Identity (OpenID Connect)** — `https://auth.eonnext.com/` — the only machine-readable contract E.ON Next publishes. An Auth0-hosted E.ON group CIAM tenant (certificate CN `eon-next-uk.eon-ciam.auth0app.com`) that serves a complete anonymous [OIDC discovery document](https://auth.eonnext.com/.well-known/openid-configuration), the RFC 8414 [authorization-server metadata](https://auth.eonnext.com/.well-known/oauth-authorization-server) alias, and the [JWKS](https://auth.eonnext.com/.well-known/jwks.json). It authenticates customers into the online account and mobile app. It is not a developer programme: no third-party client registration path is documented, no resource server or domain scope is advertised, and no energy data is reachable through it.
 
-The full probe is recorded in [review.yml](review.yml). Every candidate developer host and path was checked anonymously on 2026-07-27: `developer.eonnext.com`, `developers.eonnext.com` and `docs.eonnext.com` do not resolve; `api.eonnext.com` and `data.eonnext.com` return the AWS API Gateway `{"message":"Missing Authentication Token"}` 403 on every path including `/v1/graphql/`, `/openapi.json`, `/swagger.json` and `/.well-known/openid-configuration`; and `/developers`, `/api`, `/docs`, `/data`, `/open-data` and `/api-docs` on `www.eonnext.com` all return 404. The company's own sitemap index enumerates 364 URLs, none of which contain a developer, API, docs, or open-data path segment.
+_No developer API, and no consumer data API, is documented by E.ON Next._
+
+The full probe is recorded in [review.yml](review.yml). Every candidate developer host and path was checked anonymously on 2026-07-27 and re-checked in the round-2 enrichment sweep: `developer.eonnext.com`, `developers.eonnext.com`, `docs.eonnext.com` and `status.eonnext.com` do not resolve; `api.eonnext.com` and `data.eonnext.com` return the AWS API Gateway `{"message":"Missing Authentication Token"}` 403 on every path including `/v1/graphql/`, `/openapi.json`, `/openapi.yaml`, `/swagger.json`, `/api-docs`, `/redoc`, `/rapidoc` and `/health`; and `/developers`, `/api`, `/docs`, `/data`, `/open-data`, `/api-docs` and `/llms.txt` on `www.eonnext.com` all return 404. The company's own sitemap index enumerates 414 URLs, none of which contain a developer, API, docs, or open-data path segment. No first-party SDK exists in npm or PyPI.
 
 ## Regulatory Posture
 
@@ -36,11 +39,20 @@ The full probe is recorded in [review.yml](review.yml). Every candidate develope
 - **Data standard:** SMETS2 / Smart Energy Code infrastructure only. No Green Button/ESPI, CDR Consumer Data Standards, OCPP/OCPI, OpenADR, IEEE 2030.5, or IEC CIM reference found.
 - **Consumer data vs market data:** closed on both. No consumer usage/billing API, and no open grid or market data — in Britain that is published by NESO, Elexon, and the DNOs, not by a retailer.
 - **Access gate:** `none-published`. A developer wanting GB smart-meter data programmatically must become a Smart Energy Code party in the DCC "Other User" role, or use a consent intermediary that already holds that status. The route bypasses the supplier by design.
-- **Auth model:** none published. No OIDC discovery document is served anonymously; the only authentication is a customer web/mobile account login.
+- **Auth model:** customer identity only. `auth.eonnext.com` (Auth0 CIAM) serves a full anonymous OIDC/RFC 8414 discovery document — authorization code with PKCE, device code, CIBA, token exchange, `private_key_jwt` and mTLS client authentication with certificate-bound tokens, DPoP (ES256), and a dedicated MFA challenge endpoint. Every advertised scope is a standard OIDC or Auth0 claim scope; there is no domain scope and no resource server. No API-key programme, no partner accreditation, and no documented third-party client registration. See [authentication/](authentication/eon-next-authentication.yml) and [scopes/](scopes/eon-next-scopes.yml).
 
 ## Platform Note
 
 E.ON Next runs on Kraken and the vendor's own [case study](https://kraken.tech/case-studies/eon-next) describes an "API-first architecture and GraphQL-enabled services". The same platform under Octopus Energy's brand powers a real public developer portal at `developer.octopus.energy`. Licensing an API-first platform does not license an API-first posture.
+
+## Artifacts
+
+- [well-known/](well-known/eon-next-well-known.yml) — every `/.well-known/` path on every host with its observed status, plus the harvested [security.txt](well-known/eon-next-security.txt), [OIDC discovery](well-known/eon-next-openid-configuration.json), [RFC 8414 metadata](well-known/eon-next-oauth-authorization-server.json) and [JWKS](well-known/eon-next-jwks.json).
+- [authentication/](authentication/eon-next-authentication.yml) — the OIDC/OAuth 2.0 posture of `auth.eonnext.com`, and the undisclosed AWS API Gateway scheme on `api`/`data`.
+- [scopes/](scopes/eon-next-scopes.yml) — the 14 advertised scopes. All identity, zero domain scopes.
+- [conformance/](conformance/eon-next-conformance.yml) — the identity standards implemented, and the API and energy-data standards searched for and not found.
+- [security/](security/eon-next-domain-security.yml) — TLS/HSTS/DNSSEC/CAA/SPF/DMARC across five hosts, and the [disclosure channel](security/eon-next-vulnerability-disclosure.yml).
+- [llms/](llms/eon-next-llms.txt) — what an agent can and cannot call here, generated (E.ON Next publishes no `llms.txt`).
 
 ## Common Properties
 
@@ -51,6 +63,8 @@ E.ON Next runs on Kraken and the vendor's own [case study](https://kraken.tech/c
 - [Forum](https://community.eonnext.com/)
 - [Pricing](https://www.eonnext.com/tariffs)
 - [About](https://www.eonnext.com/about)
+- [Login](https://www.eonnext.com/dashboard/sign-in)
+- [Terms and Conditions](https://www.eonnext.com/terms-and-conditions)
 - [Privacy](https://www.eonnext.com/privacy)
 - [security.txt](https://www.eonnext.com/.well-known/security.txt)
 

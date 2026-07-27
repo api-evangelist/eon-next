@@ -1,0 +1,53 @@
+generated: '2026-07-27'
+method: searched
+source: https://auth.eonnext.com/.well-known/openid-configuration
+docs: null
+docs_note: >-
+  E.ON Next publishes no scopes/permissions reference page — no developer portal
+  exists. The scope list below is the scopes_supported array advertised by the
+  authorization server itself, fetched anonymously on 2026-07-27 and saved
+  verbatim at well-known/eon-next-openid-configuration.json.
+description: >-
+  Every scope E.ON Next's authorization server advertises is a standard OpenID
+  Connect scope or an Auth0 claim-shaped scope. There is no domain scope — no
+  read:meter, no read:usage, no read:billing, no account scope of any kind. That
+  absence is the finding: the authorization server governs identity for the
+  customer account UI, and no energy-data resource server is exposed to
+  third-party clients. Do not read this list as an entitlement model for
+  consumption or billing data; that data has no published API at all.
+schemes:
+- name: eon-next-ciam-oidc
+  issuer: https://auth.eonnext.com/
+  source: well-known/eon-next-openid-configuration.json
+  flows:
+  - flow: authorizationCode
+    authorizationUrl: https://auth.eonnext.com/authorize
+    tokenUrl: https://auth.eonnext.com/oauth/token
+  - flow: implicit
+    authorizationUrl: https://auth.eonnext.com/authorize
+  - flow: clientCredentials
+    tokenUrl: https://auth.eonnext.com/oauth/token
+  - flow: deviceCode
+    deviceAuthorizationUrl: https://auth.eonnext.com/oauth/device/code
+    tokenUrl: https://auth.eonnext.com/oauth/token
+scopes:
+- {scope: openid, description: 'Request an ID token — mandatory OIDC scope.', standard: 'OpenID Connect Core 1.0'}
+- {scope: profile, description: 'Basic profile claims (name, given_name, family_name, nickname, picture).', standard: 'OpenID Connect Core 1.0'}
+- {scope: email, description: 'The email claim.', standard: 'OpenID Connect Core 1.0'}
+- {scope: address, description: 'The address claim.', standard: 'OpenID Connect Core 1.0'}
+- {scope: phone, description: 'The phone_number claim.', standard: 'OpenID Connect Core 1.0'}
+- {scope: offline_access, description: 'Issue a refresh token.', standard: 'OpenID Connect Core 1.0'}
+- {scope: name, description: 'Individual claim scope for name.', standard: 'Auth0 claim scope'}
+- {scope: given_name, description: 'Individual claim scope for given_name.', standard: 'Auth0 claim scope'}
+- {scope: family_name, description: 'Individual claim scope for family_name.', standard: 'Auth0 claim scope'}
+- {scope: nickname, description: 'Individual claim scope for nickname.', standard: 'Auth0 claim scope'}
+- {scope: picture, description: 'Individual claim scope for picture.', standard: 'Auth0 claim scope'}
+- {scope: email_verified, description: 'Individual claim scope for email_verified.', standard: 'Auth0 claim scope'}
+- {scope: created_at, description: 'Individual claim scope for the account creation timestamp.', standard: 'Auth0 claim scope'}
+- {scope: identities, description: 'Individual claim scope for linked identity providers.', standard: 'Auth0 claim scope'}
+scope_count: 14
+domain_scopes: 0
+domain_scopes_note: >-
+  No energy, metering, account, tariff, billing or payment scope is advertised.
+  Any such scope would live on a resource-server audience that E.ON Next does not
+  publish.

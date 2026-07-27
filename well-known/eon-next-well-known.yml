@@ -1,0 +1,134 @@
+generated: '2026-07-27'
+method: searched
+source: >-
+  Live anonymous HTTPS probes on 2026-07-27 of every E.ON Next host that
+  resolves — www.eonnext.com, eonnext.com, api.eonnext.com, data.eonnext.com,
+  auth.eonnext.com and community.eonnext.com — plus the E.ON group corporate host
+  www.eon.com. Every path below was requested with curl, User-Agent Mozilla/5.0,
+  redirects followed; the observed HTTP status is recorded verbatim, including
+  the misses.
+description: >-
+  E.ON Next publishes two real /.well-known/ surfaces, on two different hosts,
+  and neither of them is a developer-facing one. www.eonnext.com serves an
+  RFC 9116 security.txt (PGP-signed, the E.ON group security contact). The
+  discovery find of this round is auth.eonnext.com — the E.ON customer identity
+  and access management tenant, an Auth0 custom domain (certificate CN
+  eon-next-uk.eon-ciam.auth0app.com, Cloudflare edge) — which serves a complete,
+  anonymous OpenID Connect discovery document, the RFC 8414 authorization-server
+  metadata alias of it, and the signing JWKS. That is a real machine-readable
+  contract for E.ON Next's customer sign-in surface, and it was missed by the
+  first round because only www and api were probed. It does not change the
+  finding that there is no public developer programme: api.eonnext.com and
+  data.eonnext.com answer every /.well-known/ path with the AWS API Gateway
+  {"message":"Missing Authentication Token"} 403, and no api-catalog, ai-plugin
+  or oauth-protected-resource document exists on any host.
+documents_found: 4
+hosts:
+- host: https://auth.eonnext.com
+  role: >-
+    E.ON customer identity provider (CIAM). Auth0 tenant eon-ciam, application
+    eon-next-uk, served through Cloudflare on a Let's Encrypt certificate.
+  documents:
+  - {path: /.well-known/openid-configuration, status: 200, file: eon-next-openid-configuration.json, spec: 'OpenID Connect Discovery 1.0'}
+  - {path: /.well-known/oauth-authorization-server, status: 200, file: eon-next-oauth-authorization-server.json, spec: 'RFC 8414', note: byte-identical to the OIDC discovery document}
+  - {path: /.well-known/jwks.json, status: 200, file: eon-next-jwks.json, spec: 'RFC 7517', note: two RSA signing keys, RS256}
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  contract_discovery:
+  - {path: /openapi.json, status: 404}
+- host: https://www.eonnext.com
+  role: retail marketing and customer account website (Amazon S3 origin)
+  documents:
+  - {path: /.well-known/security.txt, status: 200, file: eon-next-security.txt, spec: 'RFC 9116'}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /llms.txt, status: 404}
+- host: https://eonnext.com
+  role: apex domain (redirects to www)
+  documents:
+  - {path: /.well-known/security.txt, status: 200, note: same PGP-signed document as www}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/oauth-protected-resource, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - {path: /llms.txt, status: 404}
+- host: https://api.eonnext.com
+  role: undocumented internal/app-facing AWS API Gateway deployment
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+  - {path: /.well-known/oauth-protected-resource, status: 403}
+  - {path: /.well-known/api-catalog, status: 403}
+  - {path: /.well-known/ai-plugin.json, status: 403}
+  - {path: /llms.txt, status: 403}
+  contract_discovery:
+  - {path: /openapi.json, status: 403}
+  - {path: /openapi.yaml, status: 403}
+  - {path: /swagger.json, status: 403}
+  - {path: /v1/openapi.json, status: 403}
+  - {path: /api-docs, status: 403}
+  - {path: /docs, status: 403}
+  - {path: /redoc, status: 403}
+  - {path: /rapidoc, status: 403}
+  - {path: /graphql, status: 403}
+  - {path: /v1/graphql/, status: 403}
+  - {path: /health, status: 403}
+  note: >-
+    Every response is the canonical 42-byte AWS API Gateway body
+    {"message":"Missing Authentication Token"}. A 403 here is an unmatched or
+    unauthenticated route, not evidence that a document exists behind it.
+- host: https://data.eonnext.com
+  role: second AWS API Gateway deployment; not an open-data portal
+  documents:
+  - {path: /.well-known/security.txt, status: 403}
+  - {path: /.well-known/openid-configuration, status: 403}
+  - {path: /.well-known/oauth-authorization-server, status: 403}
+  - {path: /.well-known/oauth-protected-resource, status: 403}
+  - {path: /.well-known/api-catalog, status: 403}
+  - {path: /.well-known/ai-plugin.json, status: 403}
+  contract_discovery:
+  - {path: /openapi.json, status: 403}
+  - {path: /swagger.json, status: 403}
+  - {path: /api-docs, status: 403}
+  - {path: /docs, status: 403}
+  - {path: /graphql, status: 403}
+- host: https://community.eonnext.com
+  role: customer community forum
+  documents:
+  - {path: /.well-known/security.txt, status: 404}
+  - {path: /.well-known/openid-configuration, status: 404}
+  - {path: /.well-known/oauth-authorization-server, status: 404}
+  - {path: /.well-known/api-catalog, status: 404}
+  - {path: /.well-known/ai-plugin.json, status: 404}
+  - path: /llms.txt
+    status: 200
+    is_llms_txt: false
+    note: >-
+      Returns HTTP 200 but the body is an Anubis proof-of-work anti-scraping
+      interstitial ("Making sure you're not a bot!"), not an llms.txt. Recorded
+      as a false positive so a later round does not harvest it.
+- host: https://www.eon.com
+  role: E.ON SE group corporate site (parent)
+  documents:
+  - {path: /.well-known/security.txt, status: 200, note: byte-identical to the E.ON Next security.txt — one group-wide document}
+hosts_that_do_not_resolve:
+- developer.eonnext.com
+- developers.eonnext.com
+- docs.eonnext.com
+- status.eonnext.com
+- mcp.eonnext.com
+security_txt:
+  published: true
+  file: eon-next-security.txt
+  url: https://www.eonnext.com/.well-known/security.txt
+  scope: group-wide (identical document served from www.eon.com)
+  contact: mailto:security@eon.com
+  expires: '2026-12-31T22:59:00.000Z'
+  signed: true
+  fields_present: [Contact, Expires, Encryption, Preferred-Languages]
+  fields_absent: [Policy, Acknowledgments, Hiring, Canonical, CSAF]

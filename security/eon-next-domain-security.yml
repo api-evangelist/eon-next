@@ -1,0 +1,81 @@
+generated: '2026-07-27'
+method: probed
+source: >-
+  live DNS/TLS/HTTP probes of the apis.yml hosts
+  (0-working/probe-domain-security.py), extended by hand on the same date with
+  `curl -sI`, `openssl s_client` and `dig` for the four hosts the script does not
+  reach from apis.yml alone — api.eonnext.com, data.eonnext.com,
+  auth.eonnext.com and community.eonnext.com. Observed header values are recorded
+  verbatim; absence of a record is real data, not a gap in the probe.
+description: >-
+  Every E.ON Next host negotiates TLS 1.3 with a valid certificate, and the
+  domain is registered on AWS Route 53. The weak spots are policy rather than
+  transport: eonnext.com publishes no CAA record, no DNSSEC, and a DMARC record
+  whose policy is p=none (monitor only, nothing quarantined or rejected). HSTS is
+  served only by the Auth0-fronted identity host; the marketing/account site on
+  S3 and both AWS API Gateway hosts send no Strict-Transport-Security header at
+  all.
+hosts:
+- host: www.eonnext.com
+  role: retail marketing and customer account website
+  https: true
+  http_status: 200
+  origin: AmazonS3
+  tls_version: TLSv1.3
+  cert_expires: Dec 29 23:59:59 2026 GMT
+  hsts: false
+  other_headers:
+  - 'x-frame-options: DENY'
+- host: auth.eonnext.com
+  role: E.ON CIAM authorization server (Auth0 tenant eon-ciam, application eon-next-uk)
+  https: true
+  http_status: 302
+  origin: cloudflare
+  tls_version: TLSv1.3
+  cert_issuer: Let's Encrypt (CN=YE1)
+  cert_expires: Oct  1 05:32:37 2026 GMT
+  hsts: true
+  hsts_header: 'max-age=31536000; includeSubDomains'
+  hsts_max_age: 31536000
+  other_headers:
+  - 'x-content-type-options: nosniff'
+- host: api.eonnext.com
+  role: undocumented AWS API Gateway deployment
+  https: true
+  http_status: 403
+  http_status_note: '{"message":"Missing Authentication Token"} on every path probed.'
+  tls_version: TLSv1.3
+  cert_issuer: Amazon RSA 2048 M01
+  cert_expires: Jan 24 23:59:59 2027 GMT
+  hsts: false
+- host: data.eonnext.com
+  role: second AWS API Gateway deployment; not an open-data portal
+  https: true
+  http_status: 403
+  tls_version: TLSv1.3
+  cert_issuer: Amazon RSA 2048 M04
+  cert_expires: Jan  8 23:59:59 2027 GMT
+  hsts: false
+- host: community.eonnext.com
+  role: customer community forum (Anubis proof-of-work anti-scraping in front)
+  https: true
+  http_status: 200
+  origin: nginx
+  tls_version: TLSv1.3
+  cert_issuer: Google Trust Services (CN=WR3)
+  cert_expires: Oct 19 05:48:16 2026 GMT
+  hsts: false
+domains:
+- domain: eonnext.com
+  nameservers: AWS Route 53 (ns-1775.awsdns-29.co.uk, ns-218.awsdns-27.com, ns-628.awsdns-14.net, ns-1484.awsdns-57.org)
+  dnssec: false
+  caa: []
+  caa_note: No CAA record — any public CA may issue for this domain.
+  spf: true
+  spf_record: 'v=spf1 include:_spf.atlassian.net include:_spf.google.com include:sendgrid.net ip4:149.72.88.178 ~all'
+  dmarc: true
+  dmarc_record: 'v=DMARC1; p=none'
+  dmarc_policy: none
+  dmarc_note: >-
+    p=none is monitor-only, with no rua/ruf reporting address published, so
+    spoofed mail is neither quarantined nor rejected.

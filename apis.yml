@@ -13,17 +13,21 @@ description: >-
   operating system licensed from Kraken Technologies (Octopus Energy Group), onto which
   5.8 million customers were migrated between June 2020 and June 2022. Its API posture
   is the exact opposite of its platform's reputation: the Kraken architecture underneath
-  is API-first, but nothing is published outward. There is no developer portal, no
-  API documentation, no OpenAPI, and no third-party route to a customer's usage or
-  billing data; developer.eonnext.com and docs.eonnext.com do not resolve, and api.eonnext.com
-  answers every path with an unauthenticated AWS API Gateway 403 "Missing Authentication
-  Token". Britain mandated the metering infrastructure, not the data right — E.ON Next
-  is bound by the Smart Energy Code and the DCC, which is live and implemented, but
-  no consumer data-portability mandate equivalent to Australia's CDR or Ontario's Green
-  Button applies to it, and none of the open GB market data (NESO Carbon Intensity,
-  Elexon BSC, DNO open-data portals) originates here. Consumer data is closed, market
-  data is published by other parties, and this profile is identity-only by evidence.
-image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/groq.png
+  is API-first, but almost nothing is published outward. There is no developer portal,
+  no API documentation, no OpenAPI, and no third-party route to a customer's usage or
+  billing data; developer.eonnext.com and docs.eonnext.com do not resolve, and both
+  api.eonnext.com and data.eonnext.com answer every path with an unauthenticated AWS API
+  Gateway 403 "Missing Authentication Token". The one machine-readable contract E.ON Next
+  does publish is its customer identity layer — auth.eonnext.com, an Auth0 CIAM tenant,
+  serves a complete anonymous OpenID Connect / RFC 8414 discovery document and JWKS —
+  which describes how a customer signs in, not how a developer gets access. Britain
+  mandated the metering infrastructure, not the data right: E.ON Next is bound by the
+  Smart Energy Code and the DCC, which is live and implemented, but no consumer
+  data-portability mandate equivalent to Australia's CDR or Ontario's Green Button applies
+  to it, and none of the open GB market data (NESO Carbon Intensity, Elexon BSC, DNO
+  open-data portals) originates here. Consumer data is closed, market data is published by
+  other parties, and the only public contract is identity.
+image: https://images.ctfassets.net/fxmb2pqc184n/5oYVaG0Ukc9ErXnwbIcXe8/c18e22523f4b37a96b9b41997100ad8c/social-logo.png
 tags:
 - Energy
 - United Kingdom
@@ -35,11 +39,62 @@ tags:
 - Kraken
 - Solar
 - EV Charging
+- Identity
 created: '2026-07-27'
 modified: '2026-07-27'
 specificationVersion: '0.19'
-apis: []
+apis:
+- aid: eon-next:identity
+  name: E.ON Next Customer Identity (OpenID Connect)
+  description: >-
+    The OpenID Connect / OAuth 2.0 authorization server that authenticates E.ON Next
+    customers into the online account and mobile app. It is an Auth0-hosted E.ON group
+    CIAM tenant (certificate CN eon-next-uk.eon-ciam.auth0app.com, Cloudflare edge) and it
+    serves a complete OIDC Discovery document, the RFC 8414 authorization-server metadata
+    alias, and the signing JWKS anonymously — so its grants, endpoints, client
+    authentication methods (including private_key_jwt and mTLS with certificate-bound
+    tokens), PKCE, device flow, CIBA, DPoP and MFA challenge surface are observable fact
+    rather than inference. This is NOT a developer programme: no client registration path
+    is documented for third parties, no resource server or domain scope is advertised, and
+    no energy data is reachable through it. It is catalogued because it is the only
+    machine-readable contract E.ON Next publishes.
+  humanURL: https://www.eonnext.com/dashboard/sign-in
+  baseURL: https://auth.eonnext.com/
+  tags:
+  - Identity
+  - Authentication
+  - OpenID Connect
+  - OAuth 2.0
+  properties:
+  - type: OpenIDConnect
+    url: https://auth.eonnext.com/.well-known/openid-configuration
+  - type: WellKnown
+    url: well-known/eon-next-well-known.yml
+  - type: Authentication
+    url: authentication/eon-next-authentication.yml
+  - type: OAuthScopes
+    url: scopes/eon-next-scopes.yml
+  - type: Login
+    url: https://www.eonnext.com/dashboard/sign-in
 common:
+- type: WellKnown
+  url: well-known/eon-next-well-known.yml
+- type: SecurityTxt
+  url: well-known/eon-next-security.txt
+- type: Authentication
+  url: authentication/eon-next-authentication.yml
+- type: OAuthScopes
+  url: scopes/eon-next-scopes.yml
+- type: Conformance
+  url: conformance/eon-next-conformance.yml
+- type: LLMsTxt
+  url: llms/eon-next-llms.txt
+- type: VulnerabilityDisclosure
+  url: security/eon-next-vulnerability-disclosure.yml
+- type: Security
+  url: https://www.eonnext.com/.well-known/security.txt
+- type: DomainSecurity
+  url: security/eon-next-domain-security.yml
 - type: Website
   url: https://www.eonnext.com/
 - type: LinkedIn
@@ -54,10 +109,12 @@ common:
   url: https://www.eonnext.com/tariffs
 - type: About
   url: https://www.eonnext.com/about
-- type: Privacy
+- type: Login
+  url: https://www.eonnext.com/dashboard/sign-in
+- type: TermsOfService
+  url: https://www.eonnext.com/terms-and-conditions
+- type: PrivacyPolicy
   url: https://www.eonnext.com/privacy
-- type: SecurityTxt
-  url: https://www.eonnext.com/.well-known/security.txt
 maintainers:
 - FN: Kin Lane
   email: kin@apievangelist.com
