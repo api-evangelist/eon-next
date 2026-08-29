@@ -27,6 +27,17 @@ description: >-
   to it, and none of the open GB market data (NESO Carbon Intensity, Elexon BSC, DNO
   open-data portals) originates here. Consumer data is closed, market data is published by
   other parties, and the only public contract is identity.
+deliveryModel:
+  model: saas
+  open_source: false
+  commercial: true
+  callable_host: false
+  label: Hosted service · you call their endpoint
+  confidence: medium
+  source:
+  - pricing
+  generated: '2026-08-28'
+  method: derived
 image: https://images.ctfassets.net/fxmb2pqc184n/5oYVaG0Ukc9ErXnwbIcXe8/c18e22523f4b37a96b9b41997100ad8c/social-logo.png
 tags:
 - Energy
