@@ -38,6 +38,20 @@ deliveryModel:
   - pricing
   generated: '2026-08-28'
   method: derived
+accessModel:
+  pricing: unknown
+  onboarding: self-serve
+  trial: false
+  try_now: false
+  public: false
+  label: Self-serve signup
+  confidence: medium
+  source:
+  - authentication
+  - scopes
+  - security
+  generated: '2026-09-02'
+  method: derived
 image: https://images.ctfassets.net/fxmb2pqc184n/5oYVaG0Ukc9ErXnwbIcXe8/c18e22523f4b37a96b9b41997100ad8c/social-logo.png
 tags:
 - Energy
