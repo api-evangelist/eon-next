@@ -1,4 +1,4 @@
-# E.ON Next (eon-next)
+# E.ON Next
 
 <!-- API-EVANGELIST-PROVENANCE:BEGIN -->
 > ### About this repository
@@ -66,72 +66,95 @@
 
 E.ON Next Energy Limited is the United Kingdom retail supply arm of the E.ON Group, formed after E.ON's 2019 acquisition of npower and serving roughly five million British households and small businesses with electricity, gas, smart meters, solar, home batteries, heat pumps and EV charging tariffs. It sits at the retail end of the GB energy value chain — buying wholesale, settling through Elexon, reading SMETS2 smart meters over the licensed Smart DCC network, and billing the customer — and it runs its entire operation on Kraken, the API-first, GraphQL-based energy operating system licensed from Kraken Technologies (Octopus Energy Group), onto which 5.8 million customers were migrated between June 2020 and June 2022. Its API posture is the exact opposite of its platform's reputation: the Kraken architecture underneath is API-first, but almost nothing is published outward. There is no developer portal, no API documentation, no OpenAPI, and no third-party route to a customer's usage or billing data; developer.eonnext.com and docs.eonnext.com do not resolve, and both api.eonnext.com and data.eonnext.com answer every path with an unauthenticated AWS API Gateway 403 "Missing Authentication Token". The one machine-readable contract E.ON Next does publish is its customer identity layer — auth.eonnext.com, an Auth0 CIAM tenant, serves a complete anonymous OpenID Connect / RFC 8414 discovery document and JWKS — which describes how a customer signs in, not how a developer gets access. Britain mandated the metering infrastructure, not the data right: E.ON Next is bound by the Smart Energy Code and the DCC, which is live and implemented, but no consumer data-portability mandate equivalent to Australia's CDR or Ontario's Green Button applies to it, and none of the open GB market data (NESO Carbon Intensity, Elexon BSC, DNO open-data portals) originates here. Consumer data is closed, market data is published by other parties, and the only public contract is identity.
 
-**APIs.json:** [https://raw.githubusercontent.com/api-evangelist/eon-next/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/eon-next/refs/heads/main/apis.yml)
+**Areas:** Energy · United Kingdom · Utilities · Electricity · Gas · Smart Metering · Energy Retail · Kraken · Solar · EV Charging · Identity
 
-## Tags
+## E.ON Next on APIs.io
 
-- Energy
-- United Kingdom
-- Utilities
-- Electricity
-- Gas
-- Smart Metering
-- Energy Retail
-- Kraken
-- Solar
-- EV Charging
-- Identity
+Everything profiled for E.ON Next is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/eon-next/](https://apis.io/providers/eon-next/)** — or go straight to one of the APIs or properties below.
 
-## Timestamps
+### APIs (1)
 
-- **Created:** 2026-07-27
-- **Modified:** 2026-07-27
+- [E.ON Next Customer Identity (OpenID Connect)](https://apis.io/apis/eon-next/identity/) — The OpenID Connect / OAuth 2.0 authorization server that authenticates E.ON Next customers into the online account and mobile app. It is an Auth0-hosted…
 
-## APIs
+### Published properties
 
-**E.ON Next Customer Identity (OpenID Connect)** — `https://auth.eonnext.com/` — the only machine-readable contract E.ON Next publishes. An Auth0-hosted E.ON group CIAM tenant (certificate CN `eon-next-uk.eon-ciam.auth0app.com`) that serves a complete anonymous [OIDC discovery document](https://auth.eonnext.com/.well-known/openid-configuration), the RFC 8414 [authorization-server metadata](https://auth.eonnext.com/.well-known/oauth-authorization-server) alias, and the [JWKS](https://auth.eonnext.com/.well-known/jwks.json). It authenticates customers into the online account and mobile app. It is not a developer programme: no third-party client registration path is documented, no resource server or domain scope is advertised, and no energy data is reachable through it.
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-_No developer API, and no consumer data API, is documented by E.ON Next._
+#### Security (3)
 
-The full probe is recorded in [review.yml](review.yml). Every candidate developer host and path was checked anonymously on 2026-07-27 and re-checked in the round-2 enrichment sweep: `developer.eonnext.com`, `developers.eonnext.com`, `docs.eonnext.com` and `status.eonnext.com` do not resolve; `api.eonnext.com` and `data.eonnext.com` return the AWS API Gateway `{"message":"Missing Authentication Token"}` 403 on every path including `/v1/graphql/`, `/openapi.json`, `/openapi.yaml`, `/swagger.json`, `/api-docs`, `/redoc`, `/rapidoc` and `/health`; and `/developers`, `/api`, `/docs`, `/data`, `/open-data`, `/api-docs` and `/llms.txt` on `www.eonnext.com` all return 404. The company's own sitemap index enumerates 414 URLs, none of which contain a developer, API, docs, or open-data path segment. No first-party SDK exists in npm or PyPI.
+Authentication, trust centre, and vulnerability disclosure.
 
-## Regulatory Posture
+- [Eon Next Authentication](https://apis.io/security/eon-next/eon-next-authentication/)
+- [Eon Next Domain Security](https://apis.io/security/eon-next/eon-next-domain-security/)
+- [Eon Next Vulnerability Disclosure](https://apis.io/security/eon-next/eon-next-vulnerability-disclosure/)
 
-- **Mandate regime:** `smart-meter-infrastructure` — the GB Smart Metering Implementation Programme, the Smart Energy Code, and the licensed Smart DCC monopoly.
-- **Mandate status:** `live-implemented`, **for the infrastructure obligation only**. Smart meters are installed and communicating over the DCC, and SEC accession is mandatory for every GB supplier. That mandate produces no supplier-published endpoint — the API in this regime belongs to the DCC, not to E.ON Next.
-- **Consumer data right:** none. There is no UK equivalent of Australia's CDR (energy) or Ontario's Green Button regulation. DESNZ's energy smart data scheme call for evidence closed 10 March 2025 with no published government response, and smart data schemes under the Data (Use and Access) Act 2025 require sector-specific secondary legislation that has not been made for energy.
-- **Data standard:** SMETS2 / Smart Energy Code infrastructure only. No Green Button/ESPI, CDR Consumer Data Standards, OCPP/OCPI, OpenADR, IEEE 2030.5, or IEC CIM reference found.
-- **Consumer data vs market data:** closed on both. No consumer usage/billing API, and no open grid or market data — in Britain that is published by NESO, Elexon, and the DNOs, not by a retailer.
-- **Access gate:** `none-published`. A developer wanting GB smart-meter data programmatically must become a Smart Energy Code party in the DCC "Other User" role, or use a consent intermediary that already holds that status. The route bypasses the supplier by design.
-- **Auth model:** customer identity only. `auth.eonnext.com` (Auth0 CIAM) serves a full anonymous OIDC/RFC 8414 discovery document — authorization code with PKCE, device code, CIBA, token exchange, `private_key_jwt` and mTLS client authentication with certificate-bound tokens, DPoP (ES256), and a dedicated MFA challenge endpoint. Every advertised scope is a standard OIDC or Auth0 claim scope; there is no domain scope and no resource server. No API-key programme, no partner accreditation, and no documented third-party client registration. See [authentication/](authentication/eon-next-authentication.yml) and [scopes/](scopes/eon-next-scopes.yml).
+#### OAuth scopes (1)
 
-## Platform Note
+The permissions the API asks for.
 
-E.ON Next runs on Kraken and the vendor's own [case study](https://kraken.tech/case-studies/eon-next) describes an "API-first architecture and GraphQL-enabled services". The same platform under Octopus Energy's brand powers a real public developer portal at `developer.octopus.energy`. Licensing an API-first platform does not license an API-first posture.
+- [Eon Next Scopes](https://apis.io/scopes/eon-next/eon-next-scopes/)
 
-## Artifacts
+## Where to find this API
 
-- [well-known/](well-known/eon-next-well-known.yml) — every `/.well-known/` path on every host with its observed status, plus the harvested [security.txt](well-known/eon-next-security.txt), [OIDC discovery](well-known/eon-next-openid-configuration.json), [RFC 8414 metadata](well-known/eon-next-oauth-authorization-server.json) and [JWKS](well-known/eon-next-jwks.json).
-- [authentication/](authentication/eon-next-authentication.yml) — the OIDC/OAuth 2.0 posture of `auth.eonnext.com`, and the undisclosed AWS API Gateway scheme on `api`/`data`.
-- [scopes/](scopes/eon-next-scopes.yml) — the 14 advertised scopes. All identity, zero domain scopes.
-- [conformance/](conformance/eon-next-conformance.yml) — the identity standards implemented, and the API and energy-data standards searched for and not found.
-- [security/](security/eon-next-domain-security.yml) — TLS/HSTS/DNSSEC/CAA/SPF/DMARC across five hosts, and the [disclosure channel](security/eon-next-vulnerability-disclosure.yml).
-- [llms/](llms/eon-next-llms.txt) — what an agent can and cannot call here, generated (E.ON Next publishes no `llms.txt`).
-
-## Common Properties
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://www.eonnext.com/)
-- [LinkedIn](https://www.linkedin.com/company/e-on-next)
-- [Blog](https://www.eonnext.com/blog)
-- [Support](https://www.eonnext.com/help)
-- [Forum](https://community.eonnext.com/)
 - [Pricing](https://www.eonnext.com/tariffs)
-- [About](https://www.eonnext.com/about)
-- [Login](https://www.eonnext.com/dashboard/sign-in)
-- [Terms and Conditions](https://www.eonnext.com/terms-and-conditions)
-- [Privacy](https://www.eonnext.com/privacy)
-- [security.txt](https://www.eonnext.com/.well-known/security.txt)
+- [Support](https://www.eonnext.com/help)
+- [Blog](https://www.eonnext.com/blog)
+- [Security](https://www.eonnext.com/.well-known/security.txt)
+- [Terms of service](https://www.eonnext.com/terms-and-conditions)
+- [Privacy policy](https://www.eonnext.com/privacy)
 
-## Maintainers
+## API Evangelist rating
 
-- Kin Lane — kin@apievangelist.com
+**Kin Score 23.6** — emerging · rubric 0.24.0 · scored 2026-10-17
+
+| Facet | Score |
+|---|---|
+| Discoverability | 73.2 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 10.5 |
+| Developer ergonomics | 19.0 |
+| Access clarity | 27.6 |
+
+**Agent readiness 15.1** — agent-aware
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | served (partial credit) |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | — |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | served (partial credit) |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | yes |
+| Agentic Commerce | — |
+
+**Regulatory alignment 36.1** — Energy & Utilities
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/eon-next/](https://apis.io/providers/eon-next/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for E.ON Next: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/eon-next/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
